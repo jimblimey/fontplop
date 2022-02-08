@@ -1,0 +1,39 @@
+object frmMain: TfrmMain
+  Left = 254
+  Height = 456
+  Top = 119
+  Width = 712
+  Caption = 'frmMain'
+  ClientHeight = 456
+  ClientWidth = 712
+  OnCreate = FormCreate
+  LCLVersion = '2.1.0.0'
+  object buttonPanel: TPanel
+    Left = 0
+    Height = 406
+    Top = 50
+    Width = 536
+    Align = alClient
+    TabOrder = 0
+    OnResize = buttonPanelResize
+  end
+  object Panel3: TPanel
+    Left = 0
+    Height = 50
+    Top = 0
+    Width = 712
+    Align = alTop
+    Caption = 'Panel3'
+    TabOrder = 1
+  end
+  object previewPanel: TScrollBox
+    Left = 536
+    Height = 406
+    Top = 50
+    Width = 176
+    HorzScrollBar.Page = 1
+    VertScrollBar.Page = 1
+    Align = alRight
+    TabOrder = 2
+  end
+end
