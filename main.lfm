@@ -3,7 +3,7 @@ object frmMain: TfrmMain
   Height = 456
   Top = 119
   Width = 712
-  Caption = 'frmMain'
+  Caption = 'Font Plop'
   ClientHeight = 456
   ClientWidth = 712
   OnCreate = FormCreate

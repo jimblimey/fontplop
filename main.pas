@@ -21,9 +21,12 @@ type
     Characters: Array[32..127] of TZXCharacter;
     buttons: Array[0..7,0..7] of TShape;
     pixels: Array[0..7,0..7] of Byte;
-    previews: Array[32..127] of TShape;
+    previews: Array[32..127] of TImage;
     CurrentCharacter: Integer;
     procedure SetButtonSize;
+    procedure SetCharacter(c: Integer; d: TZXCharacter);
+    procedure RedrawCharacter(c: Integer);
+    procedure PreviewImageClick(Sender: TObject);
   public
 
   end;
@@ -35,6 +38,7 @@ const
 
 var
   frmMain: TfrmMain;
+{$I specfont.inc}
 
 implementation
 
@@ -117,14 +121,14 @@ begin
   previewPanel.Width := 134+w+6;
   for c := 32 to 127 do
   begin
-    previews[c] := TShape.Create(Self);
+    previews[c] := TImage.Create(Self);
     previews[c].Parent := previewPanel;
     previews[c].Width := 32;
     previews[c].Height := 32;
-    previews[c].Brush.Color := Paper;
-    previews[c].Pen.Color := Paper;
     previews[c].Left := x * 34;
     previews[c].Top := y * 34;
+    previews[c].Stretch := true;
+    previews[c].OnClick := @PreviewImageClick;
     inc(x);
     if x > 3 then
     begin
@@ -133,11 +137,79 @@ begin
     end;
   end;
   CurrentCharacter := 32;
+  For c := 32 to 127 do
+  begin
+    SetCharacter(c, ZXFont[c]);
+    RedrawCharacter(c);
+  end;
+
 end;
 
 procedure TfrmMain.buttonPanelResize(Sender: TObject);
 begin
   SetButtonSize;
+end;
+
+procedure TfrmMain.PreviewImageClick(Sender: TObject);
+var
+  i,t: Integer;
+begin
+  for i := 32 to 127 do
+  begin
+    if (Sender as TImage) = previews[i] then
+    begin
+      if i <> CurrentCharacter then
+      begin
+        t := CurrentCharacter;
+        CurrentCharacter := i;
+        SetCharacter(i,Characters[i]);
+        RedrawCharacter(CurrentCharacter);
+        RedrawCharacter(t);
+      end;
+    end;
+  end;
+end;
+
+procedure TfrmMain.SetCharacter(c: Integer; d: TZXCharacter);
+var
+  i,j: Integer;
+  s: String;
+begin
+  Characters[c] := d;
+  for i := 0 to 7 do
+  begin
+    s := DecToBin(Characters[c][i]);
+    for j := 1 to 8 do
+    begin
+      if s[j] = '1' then buttons[j-1,i].Brush.Color := clBlack
+      else buttons[j-1,i].Brush.Color := clWhite;
+    end;
+  end;
+end;
+
+procedure TfrmMain.RedrawCharacter(c: Integer);
+var
+  bmp: graphics.TBitmap;
+  i,j: Integer;
+  s: String;
+  p: TColor;
+begin
+  bmp := graphics.TBitMap.Create;
+  bmp.Width := 8;
+  bmp.Height := 8;
+  if c = CurrentCharacter then p := RGB(255,0,255)
+  else p := clWhite;
+  for i := 0 to 7 do
+  begin
+    s := DecToBin(Characters[c][i]);
+    for j := 1 to 8 do
+    begin
+      if s[j] = '1' then bmp.Canvas.pixels[j-1,i] := clBlack
+      else bmp.Canvas.pixels[j-1,i] := p;
+    end;
+  end;
+  previews[c].Picture.Assign(bmp);
+  bmp.Free;
 end;
 
 procedure TfrmMain.SetButtonSize;
