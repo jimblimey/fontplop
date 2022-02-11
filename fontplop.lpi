@@ -24,23 +24,23 @@
     <RunParams>
       <FormatVersion Value="2"/>
     </RunParams>
-    <RequiredPackages>
-      <Item>
+    <RequiredPackages Count="1">
+      <Item1>
         <PackageName Value="LCL"/>
-      </Item>
+      </Item1>
     </RequiredPackages>
-    <Units>
-      <Unit>
+    <Units Count="2">
+      <Unit0>
         <Filename Value="fontplop.lpr"/>
         <IsPartOfProject Value="True"/>
-      </Unit>
-      <Unit>
+      </Unit0>
+      <Unit1>
         <Filename Value="main.pas"/>
         <IsPartOfProject Value="True"/>
         <ComponentName Value="frmMain"/>
         <HasResources Value="True"/>
         <ResourceBaseClass Value="Form"/>
-      </Unit>
+      </Unit1>
     </Units>
   </ProjectOptions>
   <CompilerOptions>
