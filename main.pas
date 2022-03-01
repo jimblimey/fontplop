@@ -6,15 +6,18 @@ interface
 
 uses
   Classes, SysUtils, Forms, Controls, Graphics, Dialogs, ExtCtrls, math, LCLIntf,
-  LCLType, StrUtils;
+  LCLType, StdCtrls, StrUtils;
 
 type
   TZXCharacter = Array[0..7] of Byte;
   { TfrmMain }
   TfrmMain = class(TForm)
+    btnLoad: TButton;
     buttonPanel: TPanel;
+    OpenDialog1: TOpenDialog;
     Panel3: TPanel;
     previewPanel: TScrollBox;
+    procedure btnLoadClick(Sender: TObject);
     procedure buttonPanelResize(Sender: TObject);
     procedure FormCreate(Sender: TObject);
   private
@@ -142,12 +145,44 @@ begin
     SetCharacter(c, ZXFont[c]);
     RedrawCharacter(c);
   end;
-
 end;
 
 procedure TfrmMain.buttonPanelResize(Sender: TObject);
 begin
   SetButtonSize;
+end;
+
+procedure TfrmMain.btnLoadClick(Sender: TObject);
+var
+  f: File of Byte;
+  b: Byte;
+  i,j: Integer;
+  c: TZXCharacter;
+begin
+  if OpenDialog1.Execute then
+  begin
+    AssignFile(f,OpenDialog1.FileName);
+    Reset(f);
+    if Filesize(f) <> 768 then
+    begin
+      showmessage('Not a valid font!');
+      CloseFile(f);
+      exit;
+    end;
+    i := 32;
+    while not eof(f) do
+    begin
+      for j := 0 to 7 do
+      begin
+        read(f,b);
+        c[j] := b;
+      end;
+      SetCharacter(i,c);
+      RedrawCharacter(i);
+      inc(i);
+    end;
+    CloseFile(f);
+  end;
 end;
 
 procedure TfrmMain.PreviewImageClick(Sender: TObject);

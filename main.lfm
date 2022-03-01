@@ -7,7 +7,7 @@ object frmMain: TfrmMain
   ClientHeight = 456
   ClientWidth = 712
   OnCreate = FormCreate
-  LCLVersion = '2.1.0.0'
+  LCLVersion = '2.0.12.0'
   object buttonPanel: TPanel
     Left = 0
     Height = 406
@@ -24,7 +24,18 @@ object frmMain: TfrmMain
     Width = 712
     Align = alTop
     Caption = 'Panel3'
+    ClientHeight = 50
+    ClientWidth = 712
     TabOrder = 1
+    object btnLoad: TButton
+      Left = 32
+      Height = 25
+      Top = 15
+      Width = 75
+      Caption = 'btnLoad'
+      OnClick = btnLoadClick
+      TabOrder = 0
+    end
   end
   object previewPanel: TScrollBox
     Left = 536
@@ -35,5 +46,9 @@ object frmMain: TfrmMain
     VertScrollBar.Page = 1
     Align = alRight
     TabOrder = 2
+  end
+  object OpenDialog1: TOpenDialog
+    Left = 179
+    Top = 180
   end
 end
