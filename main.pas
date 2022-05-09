@@ -145,6 +145,7 @@ begin
     SetCharacter(c, ZXFont[c]);
     RedrawCharacter(c);
   end;
+  SetCharacter(CurrentCharacter, ZXFont[CurrentCharacter]);
 end;
 
 procedure TfrmMain.buttonPanelResize(Sender: TObject);
