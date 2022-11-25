@@ -28,6 +28,9 @@ type
     pixels: Array[0..7,0..7] of Byte;
     previews: Array[32..127] of TImage;
     CurrentCharacter: Integer;
+    Paper: TColor;
+    Ink: TColor;
+    colours: array[0..1] of TColor;
     procedure SetButtonSize;
     procedure SetCharacter(c: Integer; d: TZXCharacter);
     procedure UpdateCharacter(c: Integer);
@@ -39,8 +42,6 @@ type
   end;
 
 const
-  Paper = clWhite;
-  Ink = clBlack;
   GridSize = 8;
 
 var
@@ -114,6 +115,49 @@ begin
   else Result := clWhite;
 end;
 
+function GetDistance(current: TColor; match: TColor): Integer;
+var
+  rdiff, gdiff, bdiff: Integer;
+begin
+  rdiff := GetRValue(current) - GetRValue(match);
+  gdiff := GetGValue(current) - GetGValue(match);
+  bdiff := GetBValue(current) - GetBValue(match);
+  Result := rdiff * rdiff + gdiff * gdiff + bdiff * bdiff;
+end;
+
+function FindNearestColour(col: TColor; map: array of TColor): Integer;
+var
+  i, index: Integer;
+  shortest: Integer;
+  distance: Integer;
+begin
+  index := -1;
+  shortest := High(Integer);
+  for i := 0 to High(map) do
+  begin
+    distance := GetDistance(map[i],col);
+    if distance < shortest then
+    begin
+      index := i;
+      shortest := distance;
+    end;
+  end;
+  Result := index;
+end;
+
+function ColourToHTML(inCol: TColor): String;
+var
+  i: Integer;
+  S: String;
+begin
+  i := Integer(inCol);
+  S := '#';
+  S := S + copy(IntToHex(i, 7), 6, 2);
+  S := S + copy(IntToHex(i, 7), 4, 2);
+  S := S + copy(IntToHex(i, 7), 2, 2);
+  Result := S;
+end;
+
 { TfrmMain }
 
 procedure TfrmMain.FormCreate(Sender: TObject);
@@ -121,6 +165,18 @@ var
   c,x,y,n,h,w: Integer;
 begin
   c := 0;
+  colours[0] := clBlack;
+  colours[1] := clWhite;
+
+  Paper := clWhite;
+  Ink := clBlack;
+
+  if ColourContrast(Self.GetRGBColorResolvingParent) = clWhite then
+  begin
+    Paper := clBlack;
+    Ink := clWhite;
+  end;
+
   for x := 0 to 7 do
   begin
     for y := 0 to 7 do
@@ -178,6 +234,7 @@ var
   i,j: Integer;
   c: TZXCharacter;
 begin
+  showmessage(ColourToHTML(clBtnFace));
   if OpenDialog1.Execute then
   begin
     AssignFile(f,OpenDialog1.FileName);
@@ -236,8 +293,8 @@ begin
     for j := 1 to 8 do
     begin
       pixels[j-1,i] := StrToInt(s[j]);
-      if s[j] = '1' then buttons[j-1,i].Brush.Color := clBlack
-      else buttons[j-1,i].Brush.Color := clWhite;
+      if s[j] = '1' then buttons[j-1,i].Brush.Color := Ink
+      else buttons[j-1,i].Brush.Color := Paper;
     end;
   end;
 end;
@@ -313,21 +370,19 @@ var
   bmp: graphics.TBitmap;
   i,j: Integer;
   s: String;
-  p,fg,bg: TColor;
+  p: TColor;
 begin
-  fg := clBtnText;
-  bg := clBtnFace;
   bmp := graphics.TBitMap.Create;
   bmp.Width := 8;
   bmp.Height := 8;
   if c = CurrentCharacter then p := clHighlight
-  else p := ColourContrast(fg);
+  else p := Paper;
   for i := 0 to 7 do
   begin
     s := DecToBin(Characters[c][i]);
     for j := 1 to 8 do
     begin
-      if s[j] = '1' then bmp.Canvas.pixels[j-1,i] := fg
+      if s[j] = '1' then bmp.Canvas.pixels[j-1,i] := Ink
       else bmp.Canvas.pixels[j-1,i] := p;
     end;
   end;
